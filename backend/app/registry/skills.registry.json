@@ -1,0 +1,6 @@
+{
+  "version": "1.0",
+  "skill_ids": [],
+  "skills": {},
+  "_comment": "Auto-generated or populated at runtime from app/skills/*.skill.json"
+}

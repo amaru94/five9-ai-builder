@@ -1,0 +1,56 @@
+{
+  "id": "campaign_script_builder",
+  "name": "Campaign Script Builder",
+  "description": "Build Five9 HTML5 scripts for agents. Variables use exact syntax @entity.fieldname@ (e.g. @customer.zip@). Never invent field names.",
+  "purpose": "Support lead-info-only or lead-info-plus-talk-track scripts; source-specific script variants.",
+  "authoring": {
+    "version": "1.0.0",
+    "status": "published",
+    "owner": "Five9 Ops",
+    "last_updated_by": "Five9 Ops",
+    "reviewed_by": "QA",
+    "created_at": "2025-01-25",
+    "updated_at": "2025-03-01",
+    "tags": ["script", "HTML5", "agent", "talk track"],
+    "notes": "INTERNAL actions only; artifact generation.",
+    "internal_comments": "Scripts are HTML5; variables @entity.fieldname@."
+  },
+  "routing": {
+    "trigger_phrases": ["build script", "agent script", "HTML5 script", "talk track", "script for campaign", "@customer.", "field names"],
+    "keywords": ["script", "html5", "agent", "talk track", "lead info"],
+    "discovery_questions": ["Lead-info-only or lead-info plus talk track?", "Which source-specific variants do you need?", "List the exact field names from your list/CRM."],
+    "related_skills": ["customer_discovery", "reporting_setup"]
+  },
+  "required_inputs": [
+    { "key": "script_type", "label": "Script type", "description": "lead_info_only | lead_info_plus_talk_track", "required": true, "confirm_on_new_session": false },
+    { "key": "field_names", "label": "Field names", "description": "Exact list/CRM field names for @entity.fieldname@", "required": true, "confirm_on_new_session": false }
+  ],
+  "optional_inputs": [
+    { "key": "source_variants", "label": "Source-specific variants", "description": "List of source names for variant scripts", "required": false },
+    { "key": "static_notes", "label": "Static vs externally maintained", "description": "Notes on script maintenance", "required": false }
+  ],
+  "discovery_questions": ["Lead-info-only or lead-info plus talk track?", "Which exact field names do you use?"],
+  "decision_logic": [],
+  "dependencies": [],
+  "actions": [
+    {
+      "id": "generate_script",
+      "name": "Generate HTML5 script",
+      "transport": "INTERNAL",
+      "risk_level": "low",
+      "internal_handler": "generate_script",
+      "internal_payload": {
+        "script_type": "{{script_type}}",
+        "field_names": "{{field_names}}",
+        "source_variants": "{{source_variants}}"
+      }
+    }
+  ],
+  "outputs": ["html5_script", "selected_fields_list", "notes_static_vs_external"],
+  "execution_settings": {
+    "workflow_confirmation_default": false,
+    "adaptive_step_confirmation": false,
+    "sequential_only": true,
+    "allow_partial": false
+  }
+}

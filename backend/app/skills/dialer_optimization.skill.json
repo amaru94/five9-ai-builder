@@ -1,0 +1,101 @@
+{
+  "id": "dialer_optimization",
+  "name": "Dialer Optimization",
+  "description": "Fix cases where the dialer is not reaching all leads: inspect lead demographic, dialing mode, campaign profile dial schedule/ASAP, and dispositions.",
+  "purpose": "Recommend and apply timeout, dial schedule, and disposition changes to improve list penetration.",
+  "authoring": {
+    "version": "1.0.0",
+    "status": "published",
+    "owner": "Five9 Ops",
+    "last_updated_by": "Five9 Ops",
+    "reviewed_by": "QA",
+    "created_at": "2025-01-20",
+    "updated_at": "2025-03-01",
+    "tags": ["dialer", "timeout", "dial schedule", "dispositions"],
+    "notes": "Elderly demographic -> 60s timeout; else 45s. Dialer API + campaign profiles + outbound config.",
+    "internal_comments": "Actions reference REST templates; no hardcoded URLs in Python."
+  },
+  "routing": {
+    "trigger_phrases": ["dialer not reaching leads", "dialer optimization", "timeout", "dial schedule", "list penetration", "leads not being dialed"],
+    "keywords": ["dialer", "optimization", "timeout", "dial schedule", "ASAP", "disposition"],
+    "discovery_questions": ["What is your lead demographic?", "What is your current dialing mode?", "Is Web2Campaign in use?", "What is your max attempts setting?"],
+    "related_skills": ["dialing_mode_advisor", "disposition_architecture", "asap_lead_strategy"]
+  },
+  "required_inputs": [
+    { "key": "domain_id", "label": "Domain ID", "required": true, "confirm_on_new_session": true },
+    { "key": "campaign_id", "label": "Campaign ID", "required": true, "confirm_on_new_session": true },
+    { "key": "campaign_profile_id", "label": "Campaign profile ID", "required": true, "confirm_on_new_session": true },
+    { "key": "agent_count", "label": "Agent count", "required": true, "confirm_on_new_session": true },
+    { "key": "lead_demographic", "label": "Lead demographic", "description": "e.g. elderly, general", "required": true, "confirm_on_new_session": false }
+  ],
+  "optional_inputs": [
+    { "key": "web2campaign_enabled", "label": "Web2Campaign enabled", "required": false, "confirm_on_new_session": true },
+    { "key": "max_attempts", "label": "Max attempts", "required": false },
+    { "key": "desired_time_between_dials", "label": "Desired time between dials (seconds)", "required": false }
+  ],
+  "discovery_questions": ["What is your lead demographic?", "What is your current dialing mode?", "Is Web2Campaign in use?"],
+  "decision_logic": [
+    { "condition": "lead_demographic", "value": "elderly", "then": "set_timeout_60", "else": "set_timeout_45" },
+    { "condition": "web2campaign_enabled", "value": true, "then": ["update_dial_schedule", "update_asap_if_needed"], "else": "update_dial_schedule" }
+  ],
+  "dependencies": ["customer_discovery"],
+  "actions": [
+    {
+      "id": "get_dialer_config",
+      "name": "Get campaign dialing configuration",
+      "transport": "REST",
+      "risk_level": "low",
+      "method": "GET",
+      "path": "dialer/v1/domains/{{domain_id}}/campaigns/{{campaign_id}}/configuration",
+      "headers": {},
+      "body": null
+    },
+    {
+      "id": "set_timeout_60",
+      "name": "Set ring timeout 60s (elderly)",
+      "transport": "REST",
+      "risk_level": "medium",
+      "method": "PATCH",
+      "path": "dialer/v1/domains/{{domain_id}}/campaigns/{{campaign_id}}/configuration",
+      "headers": { "Content-Type": "application/json" },
+      "body": { "ringTimeoutSeconds": 60 }
+    },
+    {
+      "id": "set_timeout_45",
+      "name": "Set ring timeout 45s",
+      "transport": "REST",
+      "risk_level": "medium",
+      "method": "PATCH",
+      "path": "dialer/v1/domains/{{domain_id}}/campaigns/{{campaign_id}}/configuration",
+      "headers": { "Content-Type": "application/json" },
+      "body": { "ringTimeoutSeconds": 45 }
+    },
+    {
+      "id": "update_dial_schedule",
+      "name": "Update campaign profile dial schedule",
+      "transport": "REST",
+      "risk_level": "medium",
+      "method": "PUT",
+      "path": "lists/v1/domains/{{domain_id}}/campaign-profiles/{{campaign_profile_id}}/dial-schedule",
+      "headers": { "Content-Type": "application/json" },
+      "body": {}
+    },
+    {
+      "id": "update_asap_if_needed",
+      "name": "Update ASAP dialing for campaign profile",
+      "transport": "REST",
+      "risk_level": "medium",
+      "method": "PUT",
+      "path": "lists/v1/domains/{{domain_id}}/campaign-profiles/{{campaign_profile_id}}/asap",
+      "headers": { "Content-Type": "application/json" },
+      "body": {}
+    }
+  ],
+  "outputs": ["dial_schedule_updated", "timeout_updated", "asap_updated"],
+  "execution_settings": {
+    "workflow_confirmation_default": true,
+    "adaptive_step_confirmation": true,
+    "sequential_only": true,
+    "allow_partial": false
+  }
+}

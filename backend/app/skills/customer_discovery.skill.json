@@ -1,0 +1,44 @@
+{
+  "id": "customer_discovery",
+  "name": "Customer Discovery",
+  "description": "Collect the customer's urgent issue, current flow, lead source, agent count, campaign objective, and whether Web2Campaign is used.",
+  "purpose": "Structured discovery for Five9 operations; no external API execution by default.",
+  "authoring": {
+    "version": "1.0.0",
+    "status": "published",
+    "owner": "Five9 Ops",
+    "last_updated_by": "Five9 Ops",
+    "reviewed_by": "QA",
+    "created_at": "2025-01-15",
+    "updated_at": "2025-03-01",
+    "tags": ["discovery", "onboarding", "context"],
+    "notes": "Foundation skill for copilot flows.",
+    "internal_comments": "No REST/SOAP actions; INTERNAL or none."
+  },
+  "routing": {
+    "trigger_phrases": ["customer discovery", "setup context", "tell me about your setup", "what's your current flow", "lead source", "agent count", "campaign objective", "web2campaign"],
+    "keywords": ["discovery", "context", "setup", "flow", "agents", "campaign", "web2campaign"],
+    "discovery_questions": ["What is your most urgent issue?", "Describe your current outbound flow.", "What is your primary lead source?", "How many agents do you have?", "What is your campaign objective?", "Do you use Web2Campaign for lead ingest?"],
+    "related_skills": ["dialer_optimization", "dialing_mode_advisor", "asap_lead_strategy", "web2campaign_ingest"]
+  },
+  "required_inputs": [
+    { "key": "urgent_issue", "label": "Urgent issue", "description": "Customer's main pain point", "required": true, "confirm_on_new_session": false },
+    { "key": "current_flow", "label": "Current flow", "description": "Brief description of outbound flow", "required": true, "confirm_on_new_session": false },
+    { "key": "lead_source", "label": "Lead source", "description": "Primary lead source type", "required": true, "confirm_on_new_session": true },
+    { "key": "agent_count", "label": "Agent count", "description": "Number of agents", "required": true, "confirm_on_new_session": true },
+    { "key": "campaign_objective", "label": "Campaign objective", "description": "Goal of the campaign", "required": true, "confirm_on_new_session": false },
+    { "key": "web2campaign_enabled", "label": "Web2Campaign enabled", "description": "Whether Web2Campaign is used", "required": true, "confirm_on_new_session": true }
+  ],
+  "optional_inputs": [],
+  "discovery_questions": ["What is your most urgent issue?", "Describe your current outbound flow.", "What is your primary lead source?", "How many agents do you have?", "What is your campaign objective?", "Do you use Web2Campaign for lead ingest?"],
+  "decision_logic": [],
+  "dependencies": [],
+  "actions": [],
+  "outputs": ["urgent_issue", "current_flow", "lead_source", "agent_count", "campaign_objective", "web2campaign_enabled"],
+  "execution_settings": {
+    "workflow_confirmation_default": false,
+    "adaptive_step_confirmation": false,
+    "sequential_only": true,
+    "allow_partial": false
+  }
+}

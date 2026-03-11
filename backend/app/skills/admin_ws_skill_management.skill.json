@@ -1,0 +1,70 @@
+{
+  "id": "admin_ws_skill_management",
+  "name": "Admin Web Services Skill Management",
+  "description": "List or create skills through SOAP Admin Web Services (getSkills, createSkill).",
+  "purpose": "Manage Five9 skills via SOAP Admin API; generic enough to add more operations via skill JSON.",
+  "authoring": {
+    "version": "1.0.0",
+    "status": "published",
+    "owner": "Five9 Ops",
+    "last_updated_by": "Five9 Ops",
+    "reviewed_by": "QA",
+    "created_at": "2025-01-28",
+    "updated_at": "2025-03-01",
+    "tags": ["SOAP", "Admin", "getSkills", "createSkill"],
+    "notes": "SOAP endpoint: .../wsadmin/{{ws_version}}/AdminWebService.",
+    "internal_comments": "More operations can be added in skill JSON."
+  },
+  "routing": {
+    "trigger_phrases": ["list skills", "create skill", "admin web services", "SOAP admin", "getSkills", "createSkill"],
+    "keywords": ["admin", "SOAP", "skill management", "getSkills", "createSkill"],
+    "discovery_questions": ["Do you need to list existing skills or create a new one?", "What skill name and configuration?"],
+    "related_skills": ["disposition_architecture"]
+  },
+  "required_inputs": [
+    { "key": "operation", "label": "Operation", "description": "getSkills | createSkill", "required": true, "confirm_on_new_session": false }
+  ],
+  "optional_inputs": [
+    { "key": "skill_name_pattern", "label": "Skill name pattern (for getSkills)", "required": false },
+    { "key": "skill_name", "label": "Skill name (for createSkill)", "required": false },
+    { "key": "ws_version", "label": "WS version", "description": "e.g. v11_5", "required": false }
+  ],
+  "discovery_questions": ["List skills or create a new skill?"],
+  "decision_logic": [],
+  "dependencies": [],
+  "actions": [
+    {
+      "id": "get_skills",
+      "name": "Get skills (SOAP)",
+      "transport": "SOAP",
+      "risk_level": "low",
+      "soap_operation": "getSkills",
+      "soap_version": "v11_5",
+      "soap_body_template": {
+        "operation": "getSkills",
+        "body": "<skillNamePattern>{{skill_name_pattern}}</skillNamePattern>",
+        "namespace": "http://service.admin.ws.five9.com/v11_5/"
+      }
+    },
+    {
+      "id": "create_skill",
+      "name": "Create skill (SOAP)",
+      "transport": "SOAP",
+      "risk_level": "high",
+      "soap_operation": "createSkill",
+      "soap_version": "v11_5",
+      "soap_body_template": {
+        "operation": "createSkill",
+        "body": "<skillName>{{skill_name}}</skillName>",
+        "namespace": "http://service.admin.ws.five9.com/v11_5/"
+      }
+    }
+  ],
+  "outputs": ["skill_list", "skill_id"],
+  "execution_settings": {
+    "workflow_confirmation_default": true,
+    "adaptive_step_confirmation": true,
+    "sequential_only": true,
+    "allow_partial": false
+  }
+}

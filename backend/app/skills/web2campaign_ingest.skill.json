@@ -1,0 +1,75 @@
+{
+  "id": "web2campaign_ingest",
+  "name": "Web2Campaign Ingest",
+  "description": "Build and optionally execute AddToList Web2Campaign requests. Validates F9TimeToCall and F9TimeFormat together.",
+  "purpose": "Ingest leads via Web2Campaign AddToList (form-url-encoded POST or GET).",
+  "authoring": {
+    "version": "1.0.0",
+    "status": "published",
+    "owner": "Five9 Ops",
+    "last_updated_by": "Five9 Ops",
+    "reviewed_by": "QA",
+    "created_at": "2025-01-22",
+    "updated_at": "2025-03-01",
+    "tags": ["web2campaign", "AddToList", "ingest", "leads"],
+    "notes": "Required: F9domain, F9list, number1. Optional: number2, number3, F9CountryCode, F9key, F9updateCRM, F9CallASAP, F9TimeToCall, F9TimeFormat, F9retResults, F9retURL.",
+    "internal_comments": "If F9TimeToCall provided, F9TimeFormat must be provided."
+  },
+  "routing": {
+    "trigger_phrases": ["web2campaign", "AddToList", "add to list", "ingest leads", "web2campaign ingest"],
+    "keywords": ["web2campaign", "addtolist", "ingest", "F9domain", "F9list"],
+    "discovery_questions": ["Do you have F9domain and F9list?", "Is this POST or GET mode?", "Do you need F9TimeToCall (and F9TimeFormat)?"],
+    "related_skills": ["asap_lead_strategy", "customer_discovery"]
+  },
+  "required_inputs": [
+    { "key": "F9domain", "label": "F9 domain", "required": true, "confirm_on_new_session": true },
+    { "key": "F9list", "label": "F9 list", "required": true, "confirm_on_new_session": true },
+    { "key": "number1", "label": "number1 (primary phone)", "required": true, "confirm_on_new_session": false }
+  ],
+  "optional_inputs": [
+    { "key": "number2", "label": "number2", "required": false },
+    { "key": "number3", "label": "number3", "required": false },
+    { "key": "F9CountryCode", "label": "F9CountryCode", "required": false },
+    { "key": "F9key", "label": "F9key", "required": false },
+    { "key": "F9updateCRM", "label": "F9updateCRM", "required": false },
+    { "key": "F9CallASAP", "label": "F9CallASAP", "required": false },
+    { "key": "F9TimeToCall", "label": "F9TimeToCall", "required": false },
+    { "key": "F9TimeFormat", "label": "F9TimeFormat", "required": false },
+    { "key": "F9retResults", "label": "F9retResults", "required": false },
+    { "key": "F9retURL", "label": "F9retURL", "required": false }
+  ],
+  "discovery_questions": ["Do you have F9domain and F9list?", "POST or GET mode?"],
+  "decision_logic": [],
+  "dependencies": [],
+  "actions": [
+    {
+      "id": "add_to_list",
+      "name": "Web2Campaign AddToList",
+      "transport": "WEB2CAMPAIGN",
+      "risk_level": "medium",
+      "web2campaign_method": "POST",
+      "web2campaign_params": {
+        "F9domain": "{{F9domain}}",
+        "F9list": "{{F9list}}",
+        "number1": "{{number1}}",
+        "number2": "{{number2}}",
+        "number3": "{{number3}}",
+        "F9CountryCode": "{{F9CountryCode}}",
+        "F9key": "{{F9key}}",
+        "F9updateCRM": "{{F9updateCRM}}",
+        "F9CallASAP": "{{F9CallASAP}}",
+        "F9TimeToCall": "{{F9TimeToCall}}",
+        "F9TimeFormat": "{{F9TimeFormat}}",
+        "F9retResults": "{{F9retResults}}",
+        "F9retURL": "{{F9retURL}}"
+      }
+    }
+  ],
+  "outputs": ["add_result", "retResults"],
+  "execution_settings": {
+    "workflow_confirmation_default": true,
+    "adaptive_step_confirmation": false,
+    "sequential_only": true,
+    "allow_partial": false
+  }
+}

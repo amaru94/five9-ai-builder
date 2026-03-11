@@ -1,0 +1,63 @@
+{
+  "id": "disposition_architecture",
+  "name": "Disposition Architecture",
+  "description": "Standardize disposition folders and behaviors: General, Qualified, Unqualified; callback-style redialable; final outcomes final; ACW exceeded for tracking.",
+  "purpose": "Plan/create disposition structures; bulk update campaign dispositions via Outbound Campaigns Config API; SOAP for creation when needed.",
+  "authoring": {
+    "version": "1.0.0",
+    "status": "published",
+    "owner": "Five9 Ops",
+    "last_updated_by": "Five9 Ops",
+    "reviewed_by": "QA",
+    "created_at": "2025-01-18",
+    "updated_at": "2025-03-01",
+    "tags": ["disposition", "folders", "callback", "ACW"],
+    "notes": "Agents should not use system dispositions directly if it hurts reporting.",
+    "internal_comments": "SOAP pluggable for creation."
+  },
+  "routing": {
+    "trigger_phrases": ["disposition", "disposition folders", "callback disposition", "final outcome", "ACW exceeded", "disposition architecture"],
+    "keywords": ["disposition", "folder", "callback", "qualified", "unqualified"],
+    "discovery_questions": ["Do you use system dispositions directly?", "Need custom folders (General, Qualified, Unqualified)?", "Callback dispositions with timer?"],
+    "related_skills": ["dialer_optimization", "reporting_setup", "admin_ws_skill_management"]
+  },
+  "required_inputs": [
+    { "key": "domain_id", "label": "Domain ID", "required": true, "confirm_on_new_session": true },
+    { "key": "campaign_id", "label": "Campaign ID", "required": true, "confirm_on_new_session": true }
+  ],
+  "optional_inputs": [
+    { "key": "folder_structure", "label": "Folder structure (e.g. General, Qualified, Unqualified)", "required": false }
+  ],
+  "discovery_questions": ["Do you use system dispositions directly?", "Need custom folders?"],
+  "decision_logic": [],
+  "dependencies": [],
+  "actions": [
+    {
+      "id": "fast_disposition_update",
+      "name": "Fast disposition update (outbound config)",
+      "transport": "REST",
+      "risk_level": "high",
+      "method": "POST",
+      "path": "lists/v1/domains/{{domain_id}}/campaigns/{{campaign_id}}/dispositions:fast-update-inline",
+      "headers": { "Content-Type": "application/json" },
+      "body": {}
+    },
+    {
+      "id": "remote_disposition_update",
+      "name": "Remote disposition update",
+      "transport": "REST",
+      "risk_level": "high",
+      "method": "POST",
+      "path": "lists/v1/domains/{{domain_id}}/campaigns/{{campaign_id}}/dispositions:update-remote",
+      "headers": { "Content-Type": "application/json" },
+      "body": {}
+    }
+  ],
+  "outputs": ["disposition_csv_structure", "execution_plan", "summary_of_changes"],
+  "execution_settings": {
+    "workflow_confirmation_default": true,
+    "adaptive_step_confirmation": true,
+    "sequential_only": true,
+    "allow_partial": false
+  }
+}

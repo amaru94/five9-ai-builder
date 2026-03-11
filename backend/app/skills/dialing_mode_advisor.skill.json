@@ -1,0 +1,56 @@
+{
+  "id": "dialing_mode_advisor",
+  "name": "Dialing Mode Advisor",
+  "description": "Recommend Power / Progressive / Predictive based on agent count and use case. Under 20 agents prefer Power; 20+ can support Progressive; low abandon risk -> Progressive with monitored abandon threshold.",
+  "purpose": "Update dialer configuration and campaign general dialing settings.",
+  "authoring": {
+    "version": "1.0.0",
+    "status": "published",
+    "owner": "Five9 Ops",
+    "last_updated_by": "Five9 Ops",
+    "reviewed_by": "QA",
+    "created_at": "2025-01-19",
+    "updated_at": "2025-03-01",
+    "tags": ["dialing mode", "power", "progressive", "predictive", "abandon"],
+    "notes": "Call analysis and answering machine actions configurable.",
+    "internal_comments": null
+  },
+  "routing": {
+    "trigger_phrases": ["dialing mode", "power dialing", "progressive", "predictive", "abandon threshold", "call analysis"],
+    "keywords": ["dialing", "power", "progressive", "predictive", "abandon"],
+    "discovery_questions": ["How many agents?", "Current dialing mode?", "Inbound shared agents?", "Desired abandon threshold?", "Call analysis enabled?"],
+    "related_skills": ["dialer_optimization", "customer_discovery"]
+  },
+  "required_inputs": [
+    { "key": "domain_id", "label": "Domain ID", "required": true, "confirm_on_new_session": true },
+    { "key": "campaign_id", "label": "Campaign ID", "required": true, "confirm_on_new_session": true },
+    { "key": "agent_count", "label": "Agent count", "required": true, "confirm_on_new_session": true },
+    { "key": "current_dialing_mode", "label": "Current dialing mode", "required": true, "confirm_on_new_session": true },
+    { "key": "inbound_shared_agents", "label": "Inbound shared agents", "description": "bool", "required": true },
+    { "key": "desired_abandon_threshold", "label": "Desired abandon threshold", "required": true },
+    { "key": "call_analysis_enabled", "label": "Call analysis enabled", "required": true }
+  ],
+  "optional_inputs": [],
+  "discovery_questions": ["How many agents?", "Current dialing mode?", "Desired abandon threshold?"],
+  "decision_logic": [],
+  "dependencies": ["customer_discovery"],
+  "actions": [
+    {
+      "id": "update_dialer_config",
+      "name": "Update dialer configuration",
+      "transport": "REST",
+      "risk_level": "high",
+      "method": "PATCH",
+      "path": "dialer/v1/domains/{{domain_id}}/campaigns/{{campaign_id}}/configuration",
+      "headers": { "Content-Type": "application/json" },
+      "body": {}
+    }
+  ],
+  "outputs": ["recommended_mode", "config_updated"],
+  "execution_settings": {
+    "workflow_confirmation_default": true,
+    "adaptive_step_confirmation": true,
+    "sequential_only": true,
+    "allow_partial": false
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "id": "reporting_setup",
+  "name": "Reporting Setup",
+  "description": "Define what should be tracked after configuration changes: recommended reporting objects, debug summary, CSV structures for disposition reporting.",
+  "purpose": "Output reporting artifacts and CSV structures; no external API execution.",
+  "authoring": {
+    "version": "1.0.0",
+    "status": "published",
+    "owner": "Five9 Ops",
+    "last_updated_by": "Five9 Ops",
+    "reviewed_by": "QA",
+    "created_at": "2025-01-24",
+    "updated_at": "2025-03-01",
+    "tags": ["reporting", "CSV", "disposition reporting"],
+    "notes": "Outputs: recommended reporting objects, debug summary, CSV structures.",
+    "internal_comments": null
+  },
+  "routing": {
+    "trigger_phrases": ["reporting", "track after changes", "disposition reporting", "CSV", "report setup"],
+    "keywords": ["reporting", "track", "CSV", "disposition"],
+    "discovery_questions": ["What do you want to track after configuration changes?", "Need disposition CSV structure?"],
+    "related_skills": ["disposition_architecture", "dialer_optimization", "campaign_script_builder"]
+  },
+  "required_inputs": [
+    { "key": "campaign_id", "label": "Campaign ID", "required": true, "confirm_on_new_session": false },
+    { "key": "domain_id", "label": "Domain ID", "required": true, "confirm_on_new_session": false }
+  ],
+  "optional_inputs": [
+    { "key": "report_types", "label": "Report types needed", "required": false }
+  ],
+  "discovery_questions": ["What do you want to track after configuration changes?"],
+  "decision_logic": [],
+  "dependencies": [],
+  "actions": [
+    {
+      "id": "generate_reporting_artifacts",
+      "name": "Generate reporting objects and CSV structure",
+      "transport": "INTERNAL",
+      "risk_level": "low",
+      "internal_handler": "generate_report_csv",
+      "internal_payload": {
+        "domain_id": "{{domain_id}}",
+        "campaign_id": "{{campaign_id}}",
+        "report_types": "{{report_types}}"
+      }
+    }
+  ],
+  "outputs": ["recommended_reporting_objects", "debug_summary", "disposition_csv_structure"],
+  "execution_settings": {
+    "workflow_confirmation_default": false,
+    "adaptive_step_confirmation": false,
+    "sequential_only": true,
+    "allow_partial": false
+  }
+}

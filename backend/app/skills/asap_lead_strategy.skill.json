@@ -1,0 +1,55 @@
+{
+  "id": "asap_lead_strategy",
+  "name": "ASAP Lead Strategy",
+  "description": "Configure ASAP lead behavior for Web2Campaign-driven leads: ASAP attempts, window in hours, minimum duration before ASAP redial; after ASAP attempts transition to regular strategy.",
+  "purpose": "Update campaign profile ASAP settings; prepare Web2Campaign ingest defaults.",
+  "authoring": {
+    "version": "1.0.0",
+    "status": "published",
+    "owner": "Five9 Ops",
+    "last_updated_by": "Five9 Ops",
+    "reviewed_by": "QA",
+    "created_at": "2025-01-21",
+    "updated_at": "2025-03-01",
+    "tags": ["ASAP", "Web2Campaign", "lead strategy"],
+    "notes": "Ask whether Web2Campaign is used; ASAP attempts, window, redial minutes.",
+    "internal_comments": null
+  },
+  "routing": {
+    "trigger_phrases": ["ASAP", "ASAP lead", "ASAP window", "ASAP attempts", "web2campaign ASAP"],
+    "keywords": ["asap", "lead strategy", "web2campaign"],
+    "discovery_questions": ["Do you use Web2Campaign?", "How many ASAP attempts?", "ASAP window in hours?", "Minimum duration before ASAP redial?"],
+    "related_skills": ["web2campaign_ingest", "dialer_optimization"]
+  },
+  "required_inputs": [
+    { "key": "campaign_profile_id", "label": "Campaign profile ID", "required": true, "confirm_on_new_session": true },
+    { "key": "domain_id", "label": "Domain ID", "required": true, "confirm_on_new_session": true },
+    { "key": "web2campaign_enabled", "label": "Web2Campaign enabled", "required": true, "confirm_on_new_session": true },
+    { "key": "asap_attempts", "label": "ASAP attempts", "required": true },
+    { "key": "asap_window_hours", "label": "ASAP window (hours)", "required": true },
+    { "key": "asap_redial_minutes", "label": "ASAP redial minimum (minutes)", "required": true }
+  ],
+  "optional_inputs": [],
+  "discovery_questions": ["Do you use Web2Campaign?", "How many ASAP attempts?", "ASAP window in hours?"],
+  "decision_logic": [],
+  "dependencies": ["customer_discovery"],
+  "actions": [
+    {
+      "id": "update_asap_settings",
+      "name": "Update campaign profile ASAP settings",
+      "transport": "REST",
+      "risk_level": "medium",
+      "method": "PUT",
+      "path": "lists/v1/domains/{{domain_id}}/campaign-profiles/{{campaign_profile_id}}/asap",
+      "headers": { "Content-Type": "application/json" },
+      "body": {}
+    }
+  ],
+  "outputs": ["asap_updated", "web2campaign_defaults"],
+  "execution_settings": {
+    "workflow_confirmation_default": true,
+    "adaptive_step_confirmation": false,
+    "sequential_only": true,
+    "allow_partial": false
+  }
+}
