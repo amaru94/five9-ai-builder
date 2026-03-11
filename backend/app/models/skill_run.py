@@ -35,4 +35,5 @@ class SkillRun(BaseModel):
     completed_at: datetime | None = None
     error_message: str | None = None
     execution_log_ids: list[str] = Field(default_factory=list)
+    rendered_request_payloads: list[dict[str, Any]] | None = Field(default=None, description="Rendered payloads for dry_run")
     created_at: datetime = Field(default_factory=datetime.utcnow)

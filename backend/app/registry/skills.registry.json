@@ -1,6 +1,1509 @@
 {
   "version": "1.0",
-  "skill_ids": [],
-  "skills": {},
-  "_comment": "Auto-generated or populated at runtime from app/skills/*.skill.json"
+  "skill_ids": [
+    "reporting_setup",
+    "dialer_optimization",
+    "web2campaign_ingest",
+    "admin_ws_skill_management",
+    "asap_lead_strategy",
+    "dialing_mode_advisor",
+    "disposition_architecture",
+    "customer_discovery",
+    "campaign_script_builder"
+  ],
+  "skills": {
+    "reporting_setup": {
+      "id": "reporting_setup",
+      "name": "Reporting Setup",
+      "description": "Define what should be tracked after configuration changes: recommended reporting objects, debug summary, CSV structures for disposition reporting.",
+      "purpose": "Output reporting artifacts and CSV structures; no external API execution.",
+      "authoring": {
+        "version": "1.0.0",
+        "status": "published",
+        "owner": "Five9 Ops",
+        "last_updated_by": "Five9 Ops",
+        "reviewed_by": "QA",
+        "created_at": "2025-01-24",
+        "updated_at": "2025-03-01",
+        "tags": [
+          "reporting",
+          "CSV",
+          "disposition reporting"
+        ],
+        "notes": "Outputs: recommended reporting objects, debug summary, CSV structures.",
+        "internal_comments": null
+      },
+      "routing": {
+        "trigger_phrases": [
+          "reporting",
+          "track after changes",
+          "disposition reporting",
+          "CSV",
+          "report setup"
+        ],
+        "keywords": [
+          "reporting",
+          "track",
+          "CSV",
+          "disposition"
+        ],
+        "discovery_questions": [
+          "What do you want to track after configuration changes?",
+          "Need disposition CSV structure?"
+        ],
+        "related_skills": [
+          "disposition_architecture",
+          "dialer_optimization",
+          "campaign_script_builder"
+        ]
+      },
+      "required_inputs": [
+        {
+          "key": "campaign_id",
+          "label": "Campaign ID",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "domain_id",
+          "label": "Domain ID",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        }
+      ],
+      "optional_inputs": [
+        {
+          "key": "report_types",
+          "label": "Report types needed",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        }
+      ],
+      "discovery_questions": [
+        "What do you want to track after configuration changes?"
+      ],
+      "decision_logic": [],
+      "dependencies": [],
+      "actions": [
+        {
+          "id": "generate_reporting_artifacts",
+          "name": "Generate reporting objects and CSV structure",
+          "transport": "INTERNAL",
+          "risk_level": "low",
+          "requires_confirmation": false,
+          "description": null,
+          "method": null,
+          "path": null,
+          "headers": null,
+          "body": null,
+          "soap_operation": null,
+          "soap_body_template": null,
+          "soap_version": "v11_5",
+          "web2campaign_method": "POST",
+          "web2campaign_params": null,
+          "internal_handler": "generate_report_csv",
+          "internal_payload": {
+            "domain_id": "{{domain_id}}",
+            "campaign_id": "{{campaign_id}}",
+            "report_types": "{{report_types}}"
+          },
+          "when": null
+        }
+      ],
+      "outputs": [
+        "recommended_reporting_objects",
+        "debug_summary",
+        "disposition_csv_structure"
+      ],
+      "execution_settings": {
+        "workflow_confirmation_default": false,
+        "adaptive_step_confirmation": false,
+        "sequential_only": true,
+        "allow_partial": false
+      }
+    },
+    "dialer_optimization": {
+      "id": "dialer_optimization",
+      "name": "Dialer Optimization",
+      "description": "Fix cases where the dialer is not reaching all leads: inspect lead demographic, dialing mode, campaign profile dial schedule/ASAP, and dispositions.",
+      "purpose": "Recommend and apply timeout, dial schedule, and disposition changes to improve list penetration.",
+      "authoring": {
+        "version": "1.0.0",
+        "status": "published",
+        "owner": "Five9 Ops",
+        "last_updated_by": "Five9 Ops",
+        "reviewed_by": "QA",
+        "created_at": "2025-01-20",
+        "updated_at": "2025-03-01",
+        "tags": [
+          "dialer",
+          "timeout",
+          "dial schedule",
+          "dispositions"
+        ],
+        "notes": "Elderly demographic -> 60s timeout; else 45s. Dialer API + campaign profiles + outbound config.",
+        "internal_comments": "Actions reference REST templates; no hardcoded URLs in Python."
+      },
+      "routing": {
+        "trigger_phrases": [
+          "dialer not reaching leads",
+          "dialer optimization",
+          "timeout",
+          "dial schedule",
+          "list penetration",
+          "leads not being dialed"
+        ],
+        "keywords": [
+          "dialer",
+          "optimization",
+          "timeout",
+          "dial schedule",
+          "ASAP",
+          "disposition"
+        ],
+        "discovery_questions": [
+          "What is your lead demographic?",
+          "What is your current dialing mode?",
+          "Is Web2Campaign in use?",
+          "What is your max attempts setting?"
+        ],
+        "related_skills": [
+          "dialing_mode_advisor",
+          "disposition_architecture",
+          "asap_lead_strategy"
+        ]
+      },
+      "required_inputs": [
+        {
+          "key": "domain_id",
+          "label": "Domain ID",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "campaign_id",
+          "label": "Campaign ID",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "campaign_profile_id",
+          "label": "Campaign profile ID",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "agent_count",
+          "label": "Agent count",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "lead_demographic",
+          "label": "Lead demographic",
+          "description": "e.g. elderly, general",
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        }
+      ],
+      "optional_inputs": [
+        {
+          "key": "web2campaign_enabled",
+          "label": "Web2Campaign enabled",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "max_attempts",
+          "label": "Max attempts",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "desired_time_between_dials",
+          "label": "Desired time between dials (seconds)",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        }
+      ],
+      "discovery_questions": [
+        "What is your lead demographic?",
+        "What is your current dialing mode?",
+        "Is Web2Campaign in use?"
+      ],
+      "decision_logic": [
+        {
+          "condition": "lead_demographic",
+          "value": "elderly",
+          "then": "set_timeout_60",
+          "else_": "set_timeout_45"
+        },
+        {
+          "condition": "web2campaign_enabled",
+          "value": true,
+          "then": [
+            "update_dial_schedule",
+            "update_asap_if_needed"
+          ],
+          "else_": "update_dial_schedule"
+        }
+      ],
+      "dependencies": [
+        "customer_discovery"
+      ],
+      "actions": [
+        {
+          "id": "get_dialer_config",
+          "name": "Get campaign dialing configuration",
+          "transport": "REST",
+          "risk_level": "low",
+          "requires_confirmation": false,
+          "description": null,
+          "method": "GET",
+          "path": "dialer/v1/domains/{{domain_id}}/campaigns/{{campaign_id}}/configuration",
+          "headers": {},
+          "body": null,
+          "soap_operation": null,
+          "soap_body_template": null,
+          "soap_version": "v11_5",
+          "web2campaign_method": "POST",
+          "web2campaign_params": null,
+          "internal_handler": null,
+          "internal_payload": null,
+          "when": null
+        },
+        {
+          "id": "set_timeout_60",
+          "name": "Set ring timeout 60s (elderly)",
+          "transport": "REST",
+          "risk_level": "medium",
+          "requires_confirmation": false,
+          "description": null,
+          "method": "PATCH",
+          "path": "dialer/v1/domains/{{domain_id}}/campaigns/{{campaign_id}}/configuration",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "ringTimeoutSeconds": 60
+          },
+          "soap_operation": null,
+          "soap_body_template": null,
+          "soap_version": "v11_5",
+          "web2campaign_method": "POST",
+          "web2campaign_params": null,
+          "internal_handler": null,
+          "internal_payload": null,
+          "when": null
+        },
+        {
+          "id": "set_timeout_45",
+          "name": "Set ring timeout 45s",
+          "transport": "REST",
+          "risk_level": "medium",
+          "requires_confirmation": false,
+          "description": null,
+          "method": "PATCH",
+          "path": "dialer/v1/domains/{{domain_id}}/campaigns/{{campaign_id}}/configuration",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "ringTimeoutSeconds": 45
+          },
+          "soap_operation": null,
+          "soap_body_template": null,
+          "soap_version": "v11_5",
+          "web2campaign_method": "POST",
+          "web2campaign_params": null,
+          "internal_handler": null,
+          "internal_payload": null,
+          "when": null
+        },
+        {
+          "id": "update_dial_schedule",
+          "name": "Update campaign profile dial schedule",
+          "transport": "REST",
+          "risk_level": "medium",
+          "requires_confirmation": false,
+          "description": null,
+          "method": "PUT",
+          "path": "lists/v1/domains/{{domain_id}}/campaign-profiles/{{campaign_profile_id}}/dial-schedule",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {},
+          "soap_operation": null,
+          "soap_body_template": null,
+          "soap_version": "v11_5",
+          "web2campaign_method": "POST",
+          "web2campaign_params": null,
+          "internal_handler": null,
+          "internal_payload": null,
+          "when": null
+        },
+        {
+          "id": "update_asap_if_needed",
+          "name": "Update ASAP dialing for campaign profile",
+          "transport": "REST",
+          "risk_level": "medium",
+          "requires_confirmation": false,
+          "description": null,
+          "method": "PUT",
+          "path": "lists/v1/domains/{{domain_id}}/campaign-profiles/{{campaign_profile_id}}/asap",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {},
+          "soap_operation": null,
+          "soap_body_template": null,
+          "soap_version": "v11_5",
+          "web2campaign_method": "POST",
+          "web2campaign_params": null,
+          "internal_handler": null,
+          "internal_payload": null,
+          "when": null
+        }
+      ],
+      "outputs": [
+        "dial_schedule_updated",
+        "timeout_updated",
+        "asap_updated"
+      ],
+      "execution_settings": {
+        "workflow_confirmation_default": true,
+        "adaptive_step_confirmation": true,
+        "sequential_only": true,
+        "allow_partial": false
+      }
+    },
+    "web2campaign_ingest": {
+      "id": "web2campaign_ingest",
+      "name": "Web2Campaign Ingest",
+      "description": "Build and optionally execute AddToList Web2Campaign requests. Validates F9TimeToCall and F9TimeFormat together.",
+      "purpose": "Ingest leads via Web2Campaign AddToList (form-url-encoded POST or GET).",
+      "authoring": {
+        "version": "1.0.0",
+        "status": "published",
+        "owner": "Five9 Ops",
+        "last_updated_by": "Five9 Ops",
+        "reviewed_by": "QA",
+        "created_at": "2025-01-22",
+        "updated_at": "2025-03-01",
+        "tags": [
+          "web2campaign",
+          "AddToList",
+          "ingest",
+          "leads"
+        ],
+        "notes": "Required: F9domain, F9list, number1. Optional: number2, number3, F9CountryCode, F9key, F9updateCRM, F9CallASAP, F9TimeToCall, F9TimeFormat, F9retResults, F9retURL.",
+        "internal_comments": "If F9TimeToCall provided, F9TimeFormat must be provided."
+      },
+      "routing": {
+        "trigger_phrases": [
+          "web2campaign",
+          "AddToList",
+          "add to list",
+          "ingest leads",
+          "web2campaign ingest"
+        ],
+        "keywords": [
+          "web2campaign",
+          "addtolist",
+          "ingest",
+          "F9domain",
+          "F9list"
+        ],
+        "discovery_questions": [
+          "Do you have F9domain and F9list?",
+          "Is this POST or GET mode?",
+          "Do you need F9TimeToCall (and F9TimeFormat)?"
+        ],
+        "related_skills": [
+          "asap_lead_strategy",
+          "customer_discovery"
+        ]
+      },
+      "required_inputs": [
+        {
+          "key": "F9domain",
+          "label": "F9 domain",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "F9list",
+          "label": "F9 list",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "number1",
+          "label": "number1 (primary phone)",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        }
+      ],
+      "optional_inputs": [
+        {
+          "key": "number2",
+          "label": "number2",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "number3",
+          "label": "number3",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "F9CountryCode",
+          "label": "F9CountryCode",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "F9key",
+          "label": "F9key",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "F9updateCRM",
+          "label": "F9updateCRM",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "F9CallASAP",
+          "label": "F9CallASAP",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "F9TimeToCall",
+          "label": "F9TimeToCall",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "F9TimeFormat",
+          "label": "F9TimeFormat",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "F9retResults",
+          "label": "F9retResults",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "F9retURL",
+          "label": "F9retURL",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        }
+      ],
+      "discovery_questions": [
+        "Do you have F9domain and F9list?",
+        "POST or GET mode?"
+      ],
+      "decision_logic": [],
+      "dependencies": [],
+      "actions": [
+        {
+          "id": "add_to_list",
+          "name": "Web2Campaign AddToList",
+          "transport": "WEB2CAMPAIGN",
+          "risk_level": "medium",
+          "requires_confirmation": false,
+          "description": null,
+          "method": null,
+          "path": null,
+          "headers": null,
+          "body": null,
+          "soap_operation": null,
+          "soap_body_template": null,
+          "soap_version": "v11_5",
+          "web2campaign_method": "POST",
+          "web2campaign_params": {
+            "F9domain": "{{F9domain}}",
+            "F9list": "{{F9list}}",
+            "number1": "{{number1}}",
+            "number2": "{{number2}}",
+            "number3": "{{number3}}",
+            "F9CountryCode": "{{F9CountryCode}}",
+            "F9key": "{{F9key}}",
+            "F9updateCRM": "{{F9updateCRM}}",
+            "F9CallASAP": "{{F9CallASAP}}",
+            "F9TimeToCall": "{{F9TimeToCall}}",
+            "F9TimeFormat": "{{F9TimeFormat}}",
+            "F9retResults": "{{F9retResults}}",
+            "F9retURL": "{{F9retURL}}"
+          },
+          "internal_handler": null,
+          "internal_payload": null,
+          "when": null
+        }
+      ],
+      "outputs": [
+        "add_result",
+        "retResults"
+      ],
+      "execution_settings": {
+        "workflow_confirmation_default": true,
+        "adaptive_step_confirmation": false,
+        "sequential_only": true,
+        "allow_partial": false
+      }
+    },
+    "admin_ws_skill_management": {
+      "id": "admin_ws_skill_management",
+      "name": "Admin Web Services Skill Management",
+      "description": "List or create skills through SOAP Admin Web Services (getSkills, createSkill).",
+      "purpose": "Manage Five9 skills via SOAP Admin API; generic enough to add more operations via skill JSON.",
+      "authoring": {
+        "version": "1.0.0",
+        "status": "published",
+        "owner": "Five9 Ops",
+        "last_updated_by": "Five9 Ops",
+        "reviewed_by": "QA",
+        "created_at": "2025-01-28",
+        "updated_at": "2025-03-01",
+        "tags": [
+          "SOAP",
+          "Admin",
+          "getSkills",
+          "createSkill"
+        ],
+        "notes": "SOAP endpoint: .../wsadmin/{{ws_version}}/AdminWebService.",
+        "internal_comments": "More operations can be added in skill JSON."
+      },
+      "routing": {
+        "trigger_phrases": [
+          "list skills",
+          "create skill",
+          "admin web services",
+          "SOAP admin",
+          "getSkills",
+          "createSkill"
+        ],
+        "keywords": [
+          "admin",
+          "SOAP",
+          "skill management",
+          "getSkills",
+          "createSkill"
+        ],
+        "discovery_questions": [
+          "Do you need to list existing skills or create a new one?",
+          "What skill name and configuration?"
+        ],
+        "related_skills": [
+          "disposition_architecture"
+        ]
+      },
+      "required_inputs": [
+        {
+          "key": "operation",
+          "label": "Operation",
+          "description": "getSkills | createSkill",
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        }
+      ],
+      "optional_inputs": [
+        {
+          "key": "skill_name_pattern",
+          "label": "Skill name pattern (for getSkills)",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "skill_name",
+          "label": "Skill name (for createSkill)",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "ws_version",
+          "label": "WS version",
+          "description": "e.g. v11_5",
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        }
+      ],
+      "discovery_questions": [
+        "List skills or create a new skill?"
+      ],
+      "decision_logic": [],
+      "dependencies": [],
+      "actions": [
+        {
+          "id": "get_skills",
+          "name": "Get skills (SOAP)",
+          "transport": "SOAP",
+          "risk_level": "low",
+          "requires_confirmation": false,
+          "description": null,
+          "method": null,
+          "path": null,
+          "headers": null,
+          "body": null,
+          "soap_operation": "getSkills",
+          "soap_body_template": {
+            "operation": "getSkills",
+            "body": "<skillNamePattern>{{skill_name_pattern}}</skillNamePattern>",
+            "namespace": "http://service.admin.ws.five9.com/v11_5/"
+          },
+          "soap_version": "v11_5",
+          "web2campaign_method": "POST",
+          "web2campaign_params": null,
+          "internal_handler": null,
+          "internal_payload": null,
+          "when": null
+        },
+        {
+          "id": "create_skill",
+          "name": "Create skill (SOAP)",
+          "transport": "SOAP",
+          "risk_level": "high",
+          "requires_confirmation": false,
+          "description": null,
+          "method": null,
+          "path": null,
+          "headers": null,
+          "body": null,
+          "soap_operation": "createSkill",
+          "soap_body_template": {
+            "operation": "createSkill",
+            "body": "<skillName>{{skill_name}}</skillName>",
+            "namespace": "http://service.admin.ws.five9.com/v11_5/"
+          },
+          "soap_version": "v11_5",
+          "web2campaign_method": "POST",
+          "web2campaign_params": null,
+          "internal_handler": null,
+          "internal_payload": null,
+          "when": null
+        }
+      ],
+      "outputs": [
+        "skill_list",
+        "skill_id"
+      ],
+      "execution_settings": {
+        "workflow_confirmation_default": true,
+        "adaptive_step_confirmation": true,
+        "sequential_only": true,
+        "allow_partial": false
+      }
+    },
+    "asap_lead_strategy": {
+      "id": "asap_lead_strategy",
+      "name": "ASAP Lead Strategy",
+      "description": "Configure ASAP lead behavior for Web2Campaign-driven leads: ASAP attempts, window in hours, minimum duration before ASAP redial; after ASAP attempts transition to regular strategy.",
+      "purpose": "Update campaign profile ASAP settings; prepare Web2Campaign ingest defaults.",
+      "authoring": {
+        "version": "1.0.0",
+        "status": "published",
+        "owner": "Five9 Ops",
+        "last_updated_by": "Five9 Ops",
+        "reviewed_by": "QA",
+        "created_at": "2025-01-21",
+        "updated_at": "2025-03-01",
+        "tags": [
+          "ASAP",
+          "Web2Campaign",
+          "lead strategy"
+        ],
+        "notes": "Ask whether Web2Campaign is used; ASAP attempts, window, redial minutes.",
+        "internal_comments": null
+      },
+      "routing": {
+        "trigger_phrases": [
+          "ASAP",
+          "ASAP lead",
+          "ASAP window",
+          "ASAP attempts",
+          "web2campaign ASAP"
+        ],
+        "keywords": [
+          "asap",
+          "lead strategy",
+          "web2campaign"
+        ],
+        "discovery_questions": [
+          "Do you use Web2Campaign?",
+          "How many ASAP attempts?",
+          "ASAP window in hours?",
+          "Minimum duration before ASAP redial?"
+        ],
+        "related_skills": [
+          "web2campaign_ingest",
+          "dialer_optimization"
+        ]
+      },
+      "required_inputs": [
+        {
+          "key": "campaign_profile_id",
+          "label": "Campaign profile ID",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "domain_id",
+          "label": "Domain ID",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "web2campaign_enabled",
+          "label": "Web2Campaign enabled",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "asap_attempts",
+          "label": "ASAP attempts",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "asap_window_hours",
+          "label": "ASAP window (hours)",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "asap_redial_minutes",
+          "label": "ASAP redial minimum (minutes)",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        }
+      ],
+      "optional_inputs": [],
+      "discovery_questions": [
+        "Do you use Web2Campaign?",
+        "How many ASAP attempts?",
+        "ASAP window in hours?"
+      ],
+      "decision_logic": [],
+      "dependencies": [
+        "customer_discovery"
+      ],
+      "actions": [
+        {
+          "id": "update_asap_settings",
+          "name": "Update campaign profile ASAP settings",
+          "transport": "REST",
+          "risk_level": "medium",
+          "requires_confirmation": false,
+          "description": null,
+          "method": "PUT",
+          "path": "lists/v1/domains/{{domain_id}}/campaign-profiles/{{campaign_profile_id}}/asap",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {},
+          "soap_operation": null,
+          "soap_body_template": null,
+          "soap_version": "v11_5",
+          "web2campaign_method": "POST",
+          "web2campaign_params": null,
+          "internal_handler": null,
+          "internal_payload": null,
+          "when": null
+        }
+      ],
+      "outputs": [
+        "asap_updated",
+        "web2campaign_defaults"
+      ],
+      "execution_settings": {
+        "workflow_confirmation_default": true,
+        "adaptive_step_confirmation": false,
+        "sequential_only": true,
+        "allow_partial": false
+      }
+    },
+    "dialing_mode_advisor": {
+      "id": "dialing_mode_advisor",
+      "name": "Dialing Mode Advisor",
+      "description": "Recommend Power / Progressive / Predictive based on agent count and use case. Under 20 agents prefer Power; 20+ can support Progressive; low abandon risk -> Progressive with monitored abandon threshold.",
+      "purpose": "Update dialer configuration and campaign general dialing settings.",
+      "authoring": {
+        "version": "1.0.0",
+        "status": "published",
+        "owner": "Five9 Ops",
+        "last_updated_by": "Five9 Ops",
+        "reviewed_by": "QA",
+        "created_at": "2025-01-19",
+        "updated_at": "2025-03-01",
+        "tags": [
+          "dialing mode",
+          "power",
+          "progressive",
+          "predictive",
+          "abandon"
+        ],
+        "notes": "Call analysis and answering machine actions configurable.",
+        "internal_comments": null
+      },
+      "routing": {
+        "trigger_phrases": [
+          "dialing mode",
+          "power dialing",
+          "progressive",
+          "predictive",
+          "abandon threshold",
+          "call analysis"
+        ],
+        "keywords": [
+          "dialing",
+          "power",
+          "progressive",
+          "predictive",
+          "abandon"
+        ],
+        "discovery_questions": [
+          "How many agents?",
+          "Current dialing mode?",
+          "Inbound shared agents?",
+          "Desired abandon threshold?",
+          "Call analysis enabled?"
+        ],
+        "related_skills": [
+          "dialer_optimization",
+          "customer_discovery"
+        ]
+      },
+      "required_inputs": [
+        {
+          "key": "domain_id",
+          "label": "Domain ID",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "campaign_id",
+          "label": "Campaign ID",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "agent_count",
+          "label": "Agent count",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "current_dialing_mode",
+          "label": "Current dialing mode",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "inbound_shared_agents",
+          "label": "Inbound shared agents",
+          "description": "bool",
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "desired_abandon_threshold",
+          "label": "Desired abandon threshold",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "call_analysis_enabled",
+          "label": "Call analysis enabled",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        }
+      ],
+      "optional_inputs": [],
+      "discovery_questions": [
+        "How many agents?",
+        "Current dialing mode?",
+        "Desired abandon threshold?"
+      ],
+      "decision_logic": [],
+      "dependencies": [
+        "customer_discovery"
+      ],
+      "actions": [
+        {
+          "id": "update_dialer_config",
+          "name": "Update dialer configuration",
+          "transport": "REST",
+          "risk_level": "high",
+          "requires_confirmation": false,
+          "description": null,
+          "method": "PATCH",
+          "path": "dialer/v1/domains/{{domain_id}}/campaigns/{{campaign_id}}/configuration",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {},
+          "soap_operation": null,
+          "soap_body_template": null,
+          "soap_version": "v11_5",
+          "web2campaign_method": "POST",
+          "web2campaign_params": null,
+          "internal_handler": null,
+          "internal_payload": null,
+          "when": null
+        }
+      ],
+      "outputs": [
+        "recommended_mode",
+        "config_updated"
+      ],
+      "execution_settings": {
+        "workflow_confirmation_default": true,
+        "adaptive_step_confirmation": true,
+        "sequential_only": true,
+        "allow_partial": false
+      }
+    },
+    "disposition_architecture": {
+      "id": "disposition_architecture",
+      "name": "Disposition Architecture",
+      "description": "Standardize disposition folders and behaviors: General, Qualified, Unqualified; callback-style redialable; final outcomes final; ACW exceeded for tracking.",
+      "purpose": "Plan/create disposition structures; bulk update campaign dispositions via Outbound Campaigns Config API; SOAP for creation when needed.",
+      "authoring": {
+        "version": "1.0.0",
+        "status": "published",
+        "owner": "Five9 Ops",
+        "last_updated_by": "Five9 Ops",
+        "reviewed_by": "QA",
+        "created_at": "2025-01-18",
+        "updated_at": "2025-03-01",
+        "tags": [
+          "disposition",
+          "folders",
+          "callback",
+          "ACW"
+        ],
+        "notes": "Agents should not use system dispositions directly if it hurts reporting.",
+        "internal_comments": "SOAP pluggable for creation."
+      },
+      "routing": {
+        "trigger_phrases": [
+          "disposition",
+          "disposition folders",
+          "callback disposition",
+          "final outcome",
+          "ACW exceeded",
+          "disposition architecture"
+        ],
+        "keywords": [
+          "disposition",
+          "folder",
+          "callback",
+          "qualified",
+          "unqualified"
+        ],
+        "discovery_questions": [
+          "Do you use system dispositions directly?",
+          "Need custom folders (General, Qualified, Unqualified)?",
+          "Callback dispositions with timer?"
+        ],
+        "related_skills": [
+          "dialer_optimization",
+          "reporting_setup",
+          "admin_ws_skill_management"
+        ]
+      },
+      "required_inputs": [
+        {
+          "key": "domain_id",
+          "label": "Domain ID",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "campaign_id",
+          "label": "Campaign ID",
+          "description": null,
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        }
+      ],
+      "optional_inputs": [
+        {
+          "key": "folder_structure",
+          "label": "Folder structure (e.g. General, Qualified, Unqualified)",
+          "description": null,
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        }
+      ],
+      "discovery_questions": [
+        "Do you use system dispositions directly?",
+        "Need custom folders?"
+      ],
+      "decision_logic": [],
+      "dependencies": [],
+      "actions": [
+        {
+          "id": "fast_disposition_update",
+          "name": "Fast disposition update (outbound config)",
+          "transport": "REST",
+          "risk_level": "high",
+          "requires_confirmation": false,
+          "description": null,
+          "method": "POST",
+          "path": "lists/v1/domains/{{domain_id}}/campaigns/{{campaign_id}}/dispositions:fast-update-inline",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {},
+          "soap_operation": null,
+          "soap_body_template": null,
+          "soap_version": "v11_5",
+          "web2campaign_method": "POST",
+          "web2campaign_params": null,
+          "internal_handler": null,
+          "internal_payload": null,
+          "when": null
+        },
+        {
+          "id": "remote_disposition_update",
+          "name": "Remote disposition update",
+          "transport": "REST",
+          "risk_level": "high",
+          "requires_confirmation": false,
+          "description": null,
+          "method": "POST",
+          "path": "lists/v1/domains/{{domain_id}}/campaigns/{{campaign_id}}/dispositions:update-remote",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {},
+          "soap_operation": null,
+          "soap_body_template": null,
+          "soap_version": "v11_5",
+          "web2campaign_method": "POST",
+          "web2campaign_params": null,
+          "internal_handler": null,
+          "internal_payload": null,
+          "when": null
+        }
+      ],
+      "outputs": [
+        "disposition_csv_structure",
+        "execution_plan",
+        "summary_of_changes"
+      ],
+      "execution_settings": {
+        "workflow_confirmation_default": true,
+        "adaptive_step_confirmation": true,
+        "sequential_only": true,
+        "allow_partial": false
+      }
+    },
+    "customer_discovery": {
+      "id": "customer_discovery",
+      "name": "Customer Discovery",
+      "description": "Collect the customer's urgent issue, current flow, lead source, agent count, campaign objective, and whether Web2Campaign is used.",
+      "purpose": "Structured discovery for Five9 operations; no external API execution by default.",
+      "authoring": {
+        "version": "1.0.0",
+        "status": "published",
+        "owner": "Five9 Ops",
+        "last_updated_by": "Five9 Ops",
+        "reviewed_by": "QA",
+        "created_at": "2025-01-15",
+        "updated_at": "2025-03-01",
+        "tags": [
+          "discovery",
+          "onboarding",
+          "context"
+        ],
+        "notes": "Foundation skill for copilot flows.",
+        "internal_comments": "No REST/SOAP actions; INTERNAL or none."
+      },
+      "routing": {
+        "trigger_phrases": [
+          "customer discovery",
+          "setup context",
+          "tell me about your setup",
+          "what's your current flow",
+          "lead source",
+          "agent count",
+          "campaign objective",
+          "web2campaign"
+        ],
+        "keywords": [
+          "discovery",
+          "context",
+          "setup",
+          "flow",
+          "agents",
+          "campaign",
+          "web2campaign"
+        ],
+        "discovery_questions": [
+          "What is your most urgent issue?",
+          "Describe your current outbound flow.",
+          "What is your primary lead source?",
+          "How many agents do you have?",
+          "What is your campaign objective?",
+          "Do you use Web2Campaign for lead ingest?"
+        ],
+        "related_skills": [
+          "dialer_optimization",
+          "dialing_mode_advisor",
+          "asap_lead_strategy",
+          "web2campaign_ingest"
+        ]
+      },
+      "required_inputs": [
+        {
+          "key": "urgent_issue",
+          "label": "Urgent issue",
+          "description": "Customer's main pain point",
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "current_flow",
+          "label": "Current flow",
+          "description": "Brief description of outbound flow",
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "lead_source",
+          "label": "Lead source",
+          "description": "Primary lead source type",
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "agent_count",
+          "label": "Agent count",
+          "description": "Number of agents",
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        },
+        {
+          "key": "campaign_objective",
+          "label": "Campaign objective",
+          "description": "Goal of the campaign",
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "web2campaign_enabled",
+          "label": "Web2Campaign enabled",
+          "description": "Whether Web2Campaign is used",
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": true,
+          "validation": null
+        }
+      ],
+      "optional_inputs": [],
+      "discovery_questions": [
+        "What is your most urgent issue?",
+        "Describe your current outbound flow.",
+        "What is your primary lead source?",
+        "How many agents do you have?",
+        "What is your campaign objective?",
+        "Do you use Web2Campaign for lead ingest?"
+      ],
+      "decision_logic": [],
+      "dependencies": [],
+      "actions": [],
+      "outputs": [
+        "urgent_issue",
+        "current_flow",
+        "lead_source",
+        "agent_count",
+        "campaign_objective",
+        "web2campaign_enabled"
+      ],
+      "execution_settings": {
+        "workflow_confirmation_default": false,
+        "adaptive_step_confirmation": false,
+        "sequential_only": true,
+        "allow_partial": false
+      }
+    },
+    "campaign_script_builder": {
+      "id": "campaign_script_builder",
+      "name": "Campaign Script Builder",
+      "description": "Build Five9 HTML5 scripts for agents. Variables use exact syntax @entity.fieldname@ (e.g. @customer.zip@). Never invent field names.",
+      "purpose": "Support lead-info-only or lead-info-plus-talk-track scripts; source-specific script variants.",
+      "authoring": {
+        "version": "1.0.0",
+        "status": "published",
+        "owner": "Five9 Ops",
+        "last_updated_by": "Five9 Ops",
+        "reviewed_by": "QA",
+        "created_at": "2025-01-25",
+        "updated_at": "2025-03-01",
+        "tags": [
+          "script",
+          "HTML5",
+          "agent",
+          "talk track"
+        ],
+        "notes": "INTERNAL actions only; artifact generation.",
+        "internal_comments": "Scripts are HTML5; variables @entity.fieldname@."
+      },
+      "routing": {
+        "trigger_phrases": [
+          "build script",
+          "agent script",
+          "HTML5 script",
+          "talk track",
+          "script for campaign",
+          "@customer.",
+          "field names"
+        ],
+        "keywords": [
+          "script",
+          "html5",
+          "agent",
+          "talk track",
+          "lead info"
+        ],
+        "discovery_questions": [
+          "Lead-info-only or lead-info plus talk track?",
+          "Which source-specific variants do you need?",
+          "List the exact field names from your list/CRM."
+        ],
+        "related_skills": [
+          "customer_discovery",
+          "reporting_setup"
+        ]
+      },
+      "required_inputs": [
+        {
+          "key": "script_type",
+          "label": "Script type",
+          "description": "lead_info_only | lead_info_plus_talk_track",
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "field_names",
+          "label": "Field names",
+          "description": "Exact list/CRM field names for @entity.fieldname@",
+          "required": true,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        }
+      ],
+      "optional_inputs": [
+        {
+          "key": "source_variants",
+          "label": "Source-specific variants",
+          "description": "List of source names for variant scripts",
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        },
+        {
+          "key": "static_notes",
+          "label": "Static vs externally maintained",
+          "description": "Notes on script maintenance",
+          "required": false,
+          "default": null,
+          "confirm_on_new_session": false,
+          "validation": null
+        }
+      ],
+      "discovery_questions": [
+        "Lead-info-only or lead-info plus talk track?",
+        "Which exact field names do you use?"
+      ],
+      "decision_logic": [],
+      "dependencies": [],
+      "actions": [
+        {
+          "id": "generate_script",
+          "name": "Generate HTML5 script",
+          "transport": "INTERNAL",
+          "risk_level": "low",
+          "requires_confirmation": false,
+          "description": null,
+          "method": null,
+          "path": null,
+          "headers": null,
+          "body": null,
+          "soap_operation": null,
+          "soap_body_template": null,
+          "soap_version": "v11_5",
+          "web2campaign_method": "POST",
+          "web2campaign_params": null,
+          "internal_handler": "generate_script",
+          "internal_payload": {
+            "script_type": "{{script_type}}",
+            "field_names": "{{field_names}}",
+            "source_variants": "{{source_variants}}"
+          },
+          "when": null
+        }
+      ],
+      "outputs": [
+        "html5_script",
+        "selected_fields_list",
+        "notes_static_vs_external"
+      ],
+      "execution_settings": {
+        "workflow_confirmation_default": false,
+        "adaptive_step_confirmation": false,
+        "sequential_only": true,
+        "allow_partial": false
+      }
+    }
+  }
 }
