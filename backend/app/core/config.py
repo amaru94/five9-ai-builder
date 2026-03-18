@@ -39,6 +39,28 @@ class Settings(BaseSettings):
         default="https://api.five9.com/web2campaign",
         description="Web2Campaign ingest base URL",
     )
+    five9_soap_username: str | None = Field(
+        default=None,
+        description="Five9 admin SOAP user (Basic auth) for DNC and Admin Web Service",
+    )
+    five9_soap_password: str | None = Field(
+        default=None,
+        description="Five9 admin SOAP password",
+    )
+    dnc_queue_db_path: str = Field(
+        default="data/dnc_queue.db",
+        description="SQLite path for after-hours DNC add jobs (relative to CWD)",
+    )
+    dnc_soap_chunk_size: int = Field(
+        default=500,
+        ge=1,
+        le=5000,
+        description="Numbers per addNumbersToDnc / removeNumbersFromDnc SOAP call",
+    )
+    dnc_api_key: str | None = Field(
+        default=None,
+        description="If set, /dnc/* requires header X-DNC-API-Key (recommended in production)",
+    )
 
     # Skills (paths relative to backend project root)
     skills_dir: str = Field(default="app/skills", description="Relative path to skill JSON folder")

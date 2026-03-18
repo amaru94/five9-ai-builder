@@ -53,6 +53,14 @@ Production-ready backend for a modular Five9 AI skill engine: classify user prob
    python -m pytest tests/ -v
    ```
 
+## Domain DNC bulk (`/dnc/bulk`)
+
+- **Up to 10,000** unique US numbers per request (10-digit NANP; accepts formatting). Stored and sent to Five9 as **E.164** (`+1…`).
+- **`add`**: Outside **11 PM–6 AM Pacific**, requests are **queued** (SQLite). The API responds with a **“queue for later / after-hours”** message and a `job_id`. A background worker runs queued adds during that window. Set `FIVE9_SOAP_USERNAME` / `FIVE9_SOAP_PASSWORD` and `EXECUTION_MODE=real` for live SOAP.
+- **`remove`**: Calls `removeNumbersFromDnc` immediately (same auth; mocked if `EXECUTION_MODE=mocked`).
+- **Job status**: `GET /dnc/jobs/{job_id}`.
+- **Production**: set **`DNC_API_KEY`**; clients must send header **`X-DNC-API-Key`**. The Next.js app uses **`SKILL_ENGINE_DNC_KEY`** with the same value when proxying.
+
 ## File tree (main pieces)
 
 ```
@@ -60,6 +68,7 @@ backend/
   app/
     main.py                 # FastAPI app, lifespan, routers
     api/
+      dnc.py                # POST /dnc/bulk, GET /dnc/jobs/{id}
       router.py             # POST /router/classify
       skills.py             # GET /skills, GET /skills/{id}, POST /skills/plan, POST /skills/execute
       workflows.py          # POST /workflows/plan, POST /workflows/execute

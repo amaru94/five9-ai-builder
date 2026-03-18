@@ -1,0 +1,3 @@
+# Local DNC queue DB and artifacts
+data/
+*.db

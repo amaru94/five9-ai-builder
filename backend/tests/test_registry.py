@@ -8,11 +8,11 @@ from app.services.skill_registry import SkillRegistry
 
 
 def test_load_skills_from_dir():
-    """Registry loading: load from app/skills and get at least the 9 seed skills."""
+    """Registry loading: load from app/skills and get at least the seed skills."""
     backend = Path(__file__).resolve().parent.parent
     skills_dir = backend / "app" / "skills"
     skills = load_skills_from_dir(skills_dir)
-    assert len(skills) >= 9
+    assert len(skills) >= 10
     expected_ids = {
         "customer_discovery",
         "dialer_optimization",
@@ -23,6 +23,7 @@ def test_load_skills_from_dir():
         "reporting_setup",
         "web2campaign_ingest",
         "admin_ws_skill_management",
+        "domain_dnc_management",
     }
     for eid in expected_ids:
         assert eid in skills, f"Missing skill: {eid}"

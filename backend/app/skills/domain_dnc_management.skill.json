@@ -1,0 +1,59 @@
+{
+  "id": "domain_dnc_management",
+  "name": "Domain DNC management",
+  "description": "Add or remove numbers on the Five9 domain DNC list (bulk up to 10k, E.164).",
+  "purpose": "Route users asking to add/remove/scrub numbers from domain DNC; execution is via Admin DNC bulk API or in-app UI.",
+  "authoring": {
+    "version": "1.0.0",
+    "status": "published",
+    "tags": ["DNC", "SOAP", "compliance"]
+  },
+  "routing": {
+    "trigger_phrases": [
+      "remove from dnc",
+      "add to dnc",
+      "domain dnc",
+      "do not call list",
+      "take off dnc",
+      "put on dnc",
+      "scrub dnc"
+    ],
+    "keywords": ["dnc", "do not call", "domain dnc", "scrub"],
+    "discovery_questions": ["Add or remove? One number or a list?"]
+  },
+  "required_inputs": [
+    {
+      "key": "action",
+      "label": "add or remove",
+      "description": "add | remove",
+      "required": true
+    }
+  ],
+  "optional_inputs": [
+    {
+      "key": "numbers",
+      "label": "Phone numbers",
+      "description": "10-digit US numbers",
+      "required": false
+    }
+  ],
+  "actions": [
+    {
+      "id": "dnc_guidance",
+      "name": "DNC guidance",
+      "transport": "INTERNAL",
+      "risk_level": "medium",
+      "internal_handler": "noop",
+      "internal_payload": {
+        "note": "Use POST /dnc/bulk (action add|remove, numbers[]) or Admin → Domain DNC bulk. Adds outside 11 PM–6 AM PT queue for after-hours."
+      }
+    }
+  ],
+  "outputs": ["dnc_status"],
+  "execution_settings": {
+    "workflow_confirmation_default": true,
+    "adaptive_step_confirmation": true,
+    "sequential_only": true,
+    "allow_partial": false
+  }
+}
