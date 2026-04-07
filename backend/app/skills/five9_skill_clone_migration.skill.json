@@ -1,0 +1,35 @@
+{
+  "id": "five9_skill_clone_migration",
+  "name": "Five9 skill clone & user migration",
+  "description": "Clone Five9 skills from a template and optionally reassign agents via CSV (source_skill → target_skill).",
+  "purpose": "Bulk-create similar skills (e.g. IB_ENG_[STATE]_TV) and move users off old skills using the app Admin UI or POST /api/five9/skills/migrate.",
+  "authoring": {
+    "version": "1.0.0",
+    "status": "published",
+    "owner": "Five9 Ops",
+    "tags": ["SOAP", "skills", "clone", "CSV", "userSkillAdd", "userSkillRemove"],
+    "notes": "CSV format documented in repo docs/SKILL_MIGRATION_CSV.md. Operations: getSkillInfo, createSkill, getUsersGeneralInfo, getUserInfo, userSkillRemove, userSkillAdd."
+  },
+  "routing": {
+    "trigger_phrases": [
+      "clone skill",
+      "copy skill",
+      "migrate users to new skill",
+      "skill migration csv",
+      "move agents to skill"
+    ],
+    "keywords": ["skill", "clone", "migration", "CSV", "user skill"],
+    "related_skills": ["admin_ws_skill_management", "dialer_optimization"]
+  },
+  "required_inputs": [],
+  "optional_inputs": [
+    { "key": "csv_path", "label": "Path to CSV (if automating)", "required": false }
+  ],
+  "actions": [],
+  "outputs": ["skill_clone_log", "user_migration_log"],
+  "execution_settings": {
+    "workflow_confirmation_default": true,
+    "sequential_only": true,
+    "allow_partial": false
+  }
+}

@@ -46,6 +46,10 @@ Single numbers or bulk (up to **10k** unique 10-digit US numbers → **E.164**).
 
 The builder **injects a Domain DNC playbook section** automatically (unless you override the **Domain DNC** module in Admin → Playbook). For production, set **`DNC_API_KEY`** on the backend and **`SKILL_ENGINE_DNC_KEY`** on the Next app to match. See **`five9-ai-builder/.env.example`**.
 
+## Skill clone & user migration (CSV)
+
+**Admin → Skill clone & user migration** (`/app/admin/skills-migration`): clone Five9 skills from a template (`getSkillInfo` → `createSkill`) and optionally move agents with `userSkillRemove` / `userSkillAdd` using an **owned CSV** (`source_skill_name`, `target_skill_name`, `clone`, `migrate_users`, `user_login`). Same Five9 login as Connect; **dry run** first. Format: **[docs/SKILL_MIGRATION_CSV.md](docs/SKILL_MIGRATION_CSV.md)**. Playbook skill id: **`five9_skill_clone_migration`**.
+
 ### Deploy
 
 Step-by-step for **Vercel + Railway**: **[DEPLOY.md](./DEPLOY.md)**.
